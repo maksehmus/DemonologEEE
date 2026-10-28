@@ -114,3 +114,96 @@ def display_full_journal():
     print("\n=== FULL GHOST JOURNAL ===")
     for ghost, evidences in Ghost.GHOST_JOURNAL.items():
         print(f"- {ghost:12}: {', '.join(evidences)}")
+
+
+
+
+def play_game():
+    #multiplier ng sanity deduction ung floor_num
+    #minus 2 sanity for moving, minus 5 for item use, minus 25 for wrong guess (nagaapply ung multiplier)
+
+    floors = {
+        1: {"name": "1st Floor", "rooms": ["VLC", "LC", "Lobby"]},
+        2: {"name": "2nd Floor", "rooms": ["Lecture Room", "Lobby", "Server Room", "Admin Room"]},
+        3: {"name": "3rd Floor", "rooms": ["ALab", "BeLab", "Wellness Room", "Inventory", "Smart iLab"]}
+    }
+
+    ghost_names = Ghost.get_all_types()
+
+    print("=======================================")
+    print("              DemonologEEE             ")
+    print("=======================================")
+
+    for current_floor_num in range(1, 4):
+        floor_data = floors[current_floor_num]
+        floor_name = floor_data["name"]
+        floor_layout = floor_data["rooms"]
+
+        actual_ghost_type = random.choice(ghost_names)
+        ghost_haunt_room = random.choice(floor_layout)
+        hidden_ghost = Ghost(actual_ghost_type, ghost_haunt_room)
+        
+        player_room = floor_layout[0] 
+        sanity = 100
+
+        inventory = [
+            Tool("EMF Reader", "EMF Level 5", max_uses=None),
+            Tool("Spirit Box", "Spirit Box", max_uses=1),
+            Tool("Thermometer", "Freezing Temps", max_uses=None),
+            Tool("Spirit Book", "Inscription", max_uses=2),
+            Tool("Blacklight", "Prints", max_uses=1),
+            Tool("Flower Pot", "Wither", max_uses=2)
+        ]
+
+        print(f"\n=======================================")
+        print(f"         ENTERING: {floor_name.upper()}        ")
+        print(f"=======================================")
+        
+        #for testing lang, TANGGALIN BY FINAL OUTPUT
+        print(f"[DEBUG] {actual_ghost_type} is in {ghost_haunt_room}")
+
+        floor_cleared = False
+
+        while not floor_cleared:
+            print(f"\n--- LOCATION: {floor_name} - {player_room} | SANITY: {sanity}% ---")
+            print("[1] Move Room  |  [2] Use Item  |  [3] Guess Entity  |  [4] View Journal  |  [5] Quit")
+            
+            choice = input("Enter choice (1-5): ")
+
+            if choice == '1':
+                print(f"\n--- {floor_name.upper()} MAP ---")
+                for i in range(len(floor_layout)):
+                    print(f"[{i+1}] {floor_layout[i]}")
+                
+                if True:
+                    room_choice = int(input(f"Where do you want to go? (1-{len(floor_layout)}): "))
+                    if 1 <= room_choice <= len(floor_layout):
+                        player_room = floor_layout[room_choice - 1]
+                        print(f"\nYou walked to the {player_room}.")
+                        sanity -= 2 * current_floor_num
+                        print(f"> Moving drained {2 * current_floor_num} sanity.")
+                    else:
+                        print("Invalid room choice. Please enter a valid number.")
+
+            elif choice == '2':
+                print("\n--- INVENTORY ---")
+                for i in range(len(inventory)):
+                    tool = inventory[i]
+                    use_display = "Unli uses" if tool.uses_left is None else f"{tool.uses_left} uses left"
+                    print(f"[{i+1}] {tool.name} ({use_display})")
+                
+                if True:
+                    item_choice = int(input("Select an item to use (1-6): "))
+                    if 1 <= item_choice <= 6:
+                        selected_tool = inventory[item_choice - 1]
+                        hidden_ghost.interact_with_tool(selected_tool, player_room, floor_layout)
+                        sanity -= 5 * current_floor_num
+                        print(f"> Using an item drained {5 * current_floor_num} sanity.")
+                    else:
+                        print("Invalid item choice. Please enter a valid number.")
+
+
+
+
+
+play_game()
