@@ -97,3 +97,20 @@ class Ghost:
         tool_object.trigger_evidence(player_distance=distance, has_evidence_trait=has_trait)
 
         print(f"> READING: {tool_object.reading}")
+
+@staticmethod
+def get_evidence_for(ghost_type):
+    #return ung specific type
+    return Ghost.GHOST_JOURNAL.get(ghost_type, "Ghost type not found in journal.")
+
+@staticmethod
+def get_all_types():
+    #return lahat ng type
+    return list(Ghost.GHOST_JOURNAL.keys())
+
+@staticmethod
+def display_full_journal():
+    #display full journal - lahat ng types saka evidences
+    print("\n=== FULL GHOST JOURNAL ===")
+    for ghost, evidences in Ghost.GHOST_JOURNAL.items():
+        print(f"- {ghost:12}: {', '.join(evidences)}")
