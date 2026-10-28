@@ -52,3 +52,48 @@ class Tool:
                 if self.evidence_type == "Inscription": self.reading = "Pages remain blank."
                 elif self.evidence_type == "Prints": self.reading = "No prints found."
                 elif self.evidence_type == "Wither": self.reading = "Plant is healthy."
+
+
+class Ghost:
+    # Class Attribute: 3 unique combination of evidences per ghost
+    GHOST_JOURNAL = {
+        "Aswang": ["EMF Level 5", "Inscription", "Wither"],
+        "Demon": ["EMF Level 5", "Freezing Temps", "Prints"],
+        "Doppelganger": ["Freezing Temps", "Inscription", "Spirit Box"],
+        "Ravager": ["EMF Level 5", "Inscription", "Spirit Box"],
+        "Revenant": ["EMF Level 5", "Freezing Temps", "Inscription"],
+        "Entity": ["Prints", "Spirit Box", "Freezing Temps"],
+        "Ghoul": ["Freezing Temps", "Spirit Box", "Wither"],
+        "Shadow": ["EMF Level 5", "Inscription", "Wither"], 
+        "Vesper": ["Inscription", "Prints", "Wither"]
+    }
+
+    def init(self, ghost_type, haunt_room):
+        # Method 1
+        self.ghost_type = ghost_type
+        self.evidences = Ghost.GHOST_JOURNAL[ghost_type]
+        self.current_room = haunt_room
+
+    def interact_with_tool(self, tool_object, player_room, floor_layout):
+        # Method 2
+        if tool_object.uses_left is not None and tool_object.uses_left <= 0:
+            #Checks if the tool still has uses left
+            print(f"\n> The {tool_object.name} has no uses left.")
+            return
+
+        player_index = floor_layout.index(player_room)
+        ghost_index = floor_layout.index(self.current_room)
+        distance = abs(player_index - ghost_index)
+        #Calculate the distance between the player and the ghost's room
+
+        has_trait = tool_object.evidence_type in self.evidences
+        #Checks if the ghost has this attribute/trait
+
+        print(f"\n> You observe the {tool_object.name} in the {player_room}...")
+
+        if tool_object.uses_left is not None:
+            tool_object.uses_left -= 1
+
+        tool_object.trigger_evidence(player_distance=distance, has_evidence_trait=has_trait)
+
+        print(f"> READING: {tool_object.reading}")
