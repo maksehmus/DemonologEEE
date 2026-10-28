@@ -53,7 +53,6 @@ class Tool:
                 elif self.evidence_type == "Prints": self.reading = "No prints found."
                 elif self.evidence_type == "Wither": self.reading = "Plant is healthy."
 
-
 class Ghost:
     # Class Attribute: 3 unique combination of evidences per ghost
     GHOST_JOURNAL = {
@@ -68,7 +67,7 @@ class Ghost:
         "Vesper": ["Inscription", "Prints", "Wither"]
     }
 
-    def init(self, ghost_type, haunt_room):
+    def __init__(self, ghost_type, haunt_room):
         # Method 1
         self.ghost_type = ghost_type
         self.evidences = Ghost.GHOST_JOURNAL[ghost_type]
@@ -84,38 +83,38 @@ class Ghost:
         player_index = floor_layout.index(player_room)
         ghost_index = floor_layout.index(self.current_room)
         distance = abs(player_index - ghost_index)
-        #Calculate the distance between the player and the ghost's room
 
         has_trait = tool_object.evidence_type in self.evidences
         #Checks if the ghost has this attribute/trait
-
+        
         print(f"\n> You observe the {tool_object.name} in the {player_room}...")
-
+        
         if tool_object.uses_left is not None:
             tool_object.uses_left -= 1
-
+        
         tool_object.trigger_evidence(player_distance=distance, has_evidence_trait=has_trait)
-
+        
         print(f"> READING: {tool_object.reading}")
 
-@staticmethod
-def get_evidence_for(ghost_type):
-    #return ung specific type
-    return Ghost.GHOST_JOURNAL.get(ghost_type, "Ghost type not found in journal.")
+    @staticmethod
+    def get_evidence_for(ghost_type):
+        #return ung specific type
+        #hindi nagamit
+        return Ghost.GHOST_JOURNAL.get(ghost_type, "Ghost type not found in journal.")
 
-@staticmethod
-def get_all_types():
-    #return lahat ng type
-    return list(Ghost.GHOST_JOURNAL.keys())
+    @staticmethod
+    def get_all_types():
+        #return lahat ng type
+        #ginamit sa definition ng ghost names sa play_game()
+        return list(Ghost.GHOST_JOURNAL.keys())
 
-@staticmethod
-def display_full_journal():
-    #display full journal - lahat ng types saka evidences
-    print("\n=== FULL GHOST JOURNAL ===")
-    for ghost, evidences in Ghost.GHOST_JOURNAL.items():
-        print(f"- {ghost:12}: {', '.join(evidences)}")
-
-
+    @staticmethod
+    def display_full_journal():
+        #display full journal - lahat ng types saka evidences
+        #sa play game ginamit for view journal move
+        print("\n=== FULL GHOST JOURNAL ===")
+        for ghost, evidences in Ghost.GHOST_JOURNAL.items():
+            print(f"- {ghost:12}: {', '.join(evidences)}")
 
 
 def play_game():
@@ -158,9 +157,7 @@ def play_game():
         print(f"\n=======================================")
         print(f"         ENTERING: {floor_name.upper()}        ")
         print(f"=======================================")
-        
-        #for testing lang, TANGGALIN BY FINAL OUTPUT
-        print(f"[DEBUG] {actual_ghost_type} is in {ghost_haunt_room}")
+    
 
         floor_cleared = False
 
@@ -202,8 +199,41 @@ def play_game():
                     else:
                         print("Invalid item choice. Please enter a valid number.")
 
+            elif choice == '3':
+                print("\n--- GHOST JOURNAL ---")
+                for i in range(len(ghost_names)):
+                    print(f"[{i + 1}] {ghost_names[i]}")
 
+                guess_choice = int(input("Who is haunting this floor? (1-9): "))
+                if 1 <= guess_choice <= 9:
+                    guessed_ghost = ghost_names[guess_choice - 1]   #minus 1 para match sa list index
+                    
+                    if guessed_ghost == actual_ghost_type:
+                        print(f"\nCORRECT! You successfully exorcised the {actual_ghost_type} from the {ghost_haunt_room}.")
+                        floor_cleared = True 
+                    else:
+                        sanity -= 25 * current_floor_num
+                        print(f"\nWRONG! The entity is angered by your false claim!")
+                        print(f"> The attack drained {25 * current_floor_num} sanity.")
+                else:
+                    print("Invalid ghost choice. Please enter a valid number.")
 
+            elif choice == '4':
+                Ghost.display_full_journal() #print journal, eto ung nasa static method
+
+            elif choice == '5':
+                print("\nYou ran out of the EEE building in fear. GAME OVER.")
+                return 
+
+            if sanity <= 0:
+                print("\nYour sanity reached 0. The darkness consumes you. GAME OVER.")
+                return
+
+    print("\n===========================================")
+    print("                YOU SURVIVED!               ")
+    print(" You cleared all floors of the EEE building.    ")
+    print("           The ghosts are gone!        ")
+    print("=============================================")
 
 
 play_game()
